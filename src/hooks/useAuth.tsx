@@ -1,4 +1,4 @@
-import { useContext, useState, createContext } from "react";
+import { useContext, useState, createContext, useEffect } from "react";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -22,13 +22,26 @@ import { ReactNode } from "react";
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null);
+	const [expiresIn, setExpiresIn] = useState<number | null>(null);
 
 	const login = (userData: User) => {
 		setUser(userData);
 	};
 
+	// useEffect(() => {
+	// 	const dateNOw = new Date().getTime();
+	// 	if (expiresIn && dateNOw > expiresIn) {
+	// 		const user = localStorage.getItem("user");
+	// 		if (user) {
+	// 			setUser(JSON.parse(user));
+	// 		}
+	// 	}
+	// }, [user, expiresIn]);
+
 	const logout = () => {
 		setUser(null);
+		// localStorage.removeItem("user");
+		// localStorage.removeItem("expiresIn");
 	};
 
 	return (
