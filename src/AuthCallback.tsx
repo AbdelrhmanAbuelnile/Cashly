@@ -20,10 +20,7 @@ const AuthCallback = () => {
 	return (
 		<div>
 			{user ? (
-				<div>
-					<h1>Welcome, {user.name}</h1>
-					{/* Render user data securely */}
-				</div>
+				<div>{/* Render user data securely */}</div>
 			) : (
 				<h1>Loading...</h1>
 			)}

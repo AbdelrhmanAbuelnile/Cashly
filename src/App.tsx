@@ -1,13 +1,4 @@
-import React from "react";
-import {
-	BrowserRouter as Router,
-	Routes,
-	Route,
-	Navigate,
-	Outlet,
-	Link,
-} from "react-router-dom";
-import AuthProvider, { useAuth } from "./hooks/useAuth";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/home/Home";
 
 const App = () => {
