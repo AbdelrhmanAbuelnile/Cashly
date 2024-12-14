@@ -10,13 +10,6 @@ interface ImageCropperProps {
 	onCancel?: () => void;
 }
 
-interface CroppedArea {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-}
-
 const ImageCropper: React.FC<ImageCropperProps> = ({
 	imageUrl,
 	cropComplete,
@@ -24,18 +17,37 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
 }) => {
 	const [crop, setCrop] = useState({ x: 0, y: 0 });
 	const [zoom, setZoom] = useState(1);
-	const [croppedAreaPixels, setCroppedAreaPixels] =
-		useState<CroppedArea | null>(null);
+	const [croppedAreaPixels, setCroppedAreaPixels] = useState<{
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} | null>(null);
 
-	const onCropComplete = useCallback((croppedAreaPixels: CroppedArea) => {
-		setCroppedAreaPixels(croppedAreaPixels);
-	}, []);
+	interface CroppedArea {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	}
+
+	const onCropComplete = useCallback(
+		(croppedArea: CroppedArea, croppedAreaPixels: CroppedArea) => {
+			console.log("🚀 ~ croppedArea:", croppedArea);
+
+			setCroppedAreaPixels(croppedAreaPixels);
+		},
+		[]
+	);
 
 	const handleCrop = useCallback(async () => {
 		try {
-			if (!croppedAreaPixels) return;
-			const croppedImage = await getCroppedImg(imageUrl, croppedAreaPixels);
-			cropComplete(croppedImage); // Call cropComplete with the cropped image file
+			if (croppedAreaPixels) {
+				const croppedImage = await getCroppedImg(imageUrl, croppedAreaPixels);
+				cropComplete(croppedImage); // Call cropComplete with the cropped image file
+			} else {
+				console.error("Cropped area pixels are null");
+			}
 		} catch (e) {
 			console.error(e);
 		}
