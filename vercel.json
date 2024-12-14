@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/.*",
+      "headers": {
+        "cache-control": "s-maxage=1,stale-while-revalidate"
+      },
+      "continue": true
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "continue": true
+    }
+  ]
+}
