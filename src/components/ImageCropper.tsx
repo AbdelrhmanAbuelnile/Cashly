@@ -10,6 +10,13 @@ interface ImageCropperProps {
 	onCancel?: () => void;
 }
 
+interface CroppedArea {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
 const ImageCropper: React.FC<ImageCropperProps> = ({
 	imageUrl,
 	cropComplete,
@@ -17,14 +24,16 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
 }) => {
 	const [crop, setCrop] = useState({ x: 0, y: 0 });
 	const [zoom, setZoom] = useState(1);
-	const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+	const [croppedAreaPixels, setCroppedAreaPixels] =
+		useState<CroppedArea | null>(null);
 
-	const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+	const onCropComplete = useCallback((croppedAreaPixels: CroppedArea) => {
 		setCroppedAreaPixels(croppedAreaPixels);
 	}, []);
 
 	const handleCrop = useCallback(async () => {
 		try {
+			if (!croppedAreaPixels) return;
 			const croppedImage = await getCroppedImg(imageUrl, croppedAreaPixels);
 			cropComplete(croppedImage); // Call cropComplete with the cropped image file
 		} catch (e) {

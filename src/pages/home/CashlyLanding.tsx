@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { Wallet, Goal, BarChart, Menu, X } from "lucide-react";
 import { useState } from "react";
