@@ -6,33 +6,6 @@ import axios from "axios";
 // Configure axios to include credentials in requests
 axios.defaults.withCredentials = true;
 
-axios.interceptors.response.use(
-	(response) => {
-		return response;
-	},
-	async (error) => {
-		const originalRequest = error.config;
-
-		// If the error is due to an expired token (401) and we haven't tried to refresh yet
-		if (error.response?.status === 401 && !originalRequest._retry) {
-			originalRequest._retry = true;
-
-			try {
-				// Attempt to refresh the token
-				const refreshed = await refreshToken();
-
-				if (refreshed) {
-					// Retry the original request
-					return axios(originalRequest);
-				}
-			} catch (refreshError) {
-				console.error("Token refresh failed in interceptor:", refreshError);
-			}
-		}
-
-		return Promise.reject(error);
-	}
-);
 // Local storage keys
 const USER_STORAGE_KEY = "auth_user";
 const AUTH_STATUS_KEY = "auth_status";
