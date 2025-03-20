@@ -15,38 +15,41 @@ import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "../../hooks/useSnackbar";
 
 const LoginPage = () => {
-	const { login } = useAuth();
 	const showSnackbar = useSnackbar();
+	const { login } = useAuth();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [rememberMe, setRememberMe] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		setLoading(true);
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		AuthApi.login({ email, password })
-			.then((res) => {
-				setLoading(false);
-				showSnackbar("Signin successful", {
-					type: "success",
-					title: "Success",
-					duration: 5000,
-				});
-				login(res.data.user, res.data.token);
-			})
-			.catch((err) => {
-				setLoading(false);
-				showSnackbar(err.response.data.message, {
-					type: "error",
-					title: "Error",
-					duration: 5000,
-				});
+		setLoading(true);
+
+		try {
+			// Pass rememberMe to the login function
+			await login({ email, password, rememberMe });
+
+			showSnackbar("Login successful", {
+				type: "success",
+				title: "Success",
+				duration: 5000,
 			});
+		} catch (error: any) {
+			showSnackbar(error?.response?.data?.message || "Login failed", {
+				type: "error",
+				title: "Error",
+				duration: 5000,
+			});
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const handleGoogleLogin = () => {
-		window.location.href = import.meta.env.VITE_BASEURL + "/auth/google";
+		// window.location.href = import.meta.env.VITE_BASEURL + "/auth/google";
+		window.location.href = "http://localhost:7000/api/v1" + "/auth/google";
 		console.log("Google Login initiated");
 	};
 
@@ -104,6 +107,21 @@ const LoginPage = () => {
 							)}
 						</button>
 					</div>
+					<div className="flex items-center">
+						<input
+							type="checkbox"
+							id="rememberMe"
+							checked={rememberMe}
+							onChange={(e) => setRememberMe(e.target.checked)}
+							className="w-4 h-4 text-[#543A14] border-[#F0BB78] rounded focus:ring-[#F0BB78]"
+						/>
+						<label
+							htmlFor="rememberMe"
+							className="ml-2 text-sm text-[#543A14]/70"
+						>
+							Remember me
+						</label>
+					</div>
 
 					<div className="flex justify-between items-center">
 						<a href="#" className="text-[#543A14]/70 hover:underline">
@@ -116,6 +134,7 @@ const LoginPage = () => {
 						whileTap={{ scale: 0.95 }}
 						type="submit"
 						className="w-full bg-[#543A14] text-[#FFF0DC] py-3 rounded-lg flex items-center justify-center hover:bg-[#131010] transition"
+						disabled={loading}
 					>
 						<span>Login</span>
 						{loading ? (

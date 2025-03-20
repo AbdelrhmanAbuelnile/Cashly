@@ -1,14 +1,53 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { userTypes } from "../types/userTypes";
+import axios from "axios";
+
+// Configure axios to include credentials in requests
+axios.defaults.withCredentials = true;
+
+axios.interceptors.response.use(
+	(response) => {
+		return response;
+	},
+	async (error) => {
+		const originalRequest = error.config;
+
+		// If the error is due to an expired token (401) and we haven't tried to refresh yet
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			originalRequest._retry = true;
+
+			try {
+				// Attempt to refresh the token
+				const refreshed = await refreshToken();
+
+				if (refreshed) {
+					// Retry the original request
+					return axios(originalRequest);
+				}
+			} catch (refreshError) {
+				console.error("Token refresh failed in interceptor:", refreshError);
+			}
+		}
+
+		return Promise.reject(error);
+	}
+);
+// Local storage keys
+const USER_STORAGE_KEY = "auth_user";
+const AUTH_STATUS_KEY = "auth_status";
 
 interface AuthContextType {
-	user: userTypes;
-	login: (user: userTypes, token: string) => void;
-	logout: () => void;
-	token: string | null;
+	user: userTypes | null;
+	login: (credentials: {
+		email: string;
+		password: string;
+		rememberMe?: boolean;
+	}) => Promise<void>;
+	logout: () => Promise<void>;
 	updateUser: (user: userTypes) => void;
+	isAuthenticated: boolean;
+	isLoading: boolean;
 }
 
 interface AuthProviderProps {
@@ -27,89 +66,201 @@ export const useAuth = () => {
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
 	const navigate = useNavigate();
-	const [user, setUser] = useState<userTypes | null>(null);
-	const [token, setToken] = useState<string | null>(null);
-	const [expiresAt, setExpiresAt] = useState<number | null>(); // 1 hour
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 
-	useEffect(() => {
-		const userString = localStorage.getItem("user");
-		const expiresAtString = localStorage.getItem("expiresAt");
-		if (userString && expiresAtString) {
-			const user = JSON.parse(userString);
-			const expiresAt = JSON.parse(expiresAtString);
-			if (user && expiresAt && new Date().getTime() < expiresAt) {
-				setUser(user);
-				setExpiresAt(3600 * 1000);
-				navigate("/dashboard");
-			}
-		}
-	}, [navigate]);
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			const expiresAtString = localStorage.getItem("expiresAt");
-			if (expiresAtString) {
-				const expiresAt = JSON.parse(expiresAtString);
-				if (new Date().getTime() >= expiresAt) {
-					logout();
-				}
-			}
-		}, 1000 * 60); // Check every minute
-
-		return () => clearInterval(interval);
+	// Initialize state from local storage if available
+	const [user, setUser] = useState<userTypes | null>(() => {
+		const storedUser = localStorage.getItem(USER_STORAGE_KEY);
+		return storedUser ? JSON.parse(storedUser) : null;
 	});
 
-	const login = (user: userTypes, token: string) => {
-		const expiryTime = new Date().getTime() + 3600 * 1000;
-		localStorage.setItem("user", JSON.stringify(user));
-		localStorage.setItem("expiresAt", JSON.stringify(expiryTime));
-		localStorage.setItem("auth", JSON.stringify(token));
-		setToken(token);
-		setUser(user);
-		setExpiresAt(expiryTime);
+	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+		const storedAuthStatus = localStorage.getItem(AUTH_STATUS_KEY);
+		return storedAuthStatus ? JSON.parse(storedAuthStatus) : false;
+	});
+
+	// Persist user and auth status to local storage when they change
+	useEffect(() => {
+		if (user) {
+			localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+		} else {
+			localStorage.removeItem(USER_STORAGE_KEY);
+		}
+	}, [user]);
+
+	useEffect(() => {
+		localStorage.setItem(AUTH_STATUS_KEY, JSON.stringify(isAuthenticated));
+	}, [isAuthenticated]);
+
+	// Function to check authentication status
+	const checkAuthStatus = async () => {
+		try {
+			// Even if we have local storage data, verify with the server
+			const response = await axios.get(
+				`${import.meta.env.VITE_BASEURL}/user/profile`,
+				{ withCredentials: true }
+			);
+
+			if (response.status === 200) {
+				setUser(response.data.user);
+				setIsAuthenticated(true);
+			}
+		} catch (error: any) {
+			console.log("Server validation error:", error.message);
+
+			// Only clear authentication if it's an auth error (401/403)
+			// This preserves local session during network issues
+			if (
+				error.response &&
+				(error.response.status === 401 || error.response.status === 403)
+			) {
+				console.log("Authentication error - clearing session");
+				setUser(null);
+				setIsAuthenticated(false);
+				localStorage.removeItem(USER_STORAGE_KEY);
+				localStorage.removeItem(AUTH_STATUS_KEY);
+			} else {
+				// For network errors, keep the existing state
+				console.log("Network or other error - maintaining existing session");
+				// Keep using localStorage values (already loaded in useState)
+			}
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
-	const logout = () => {
-		localStorage.removeItem("user");
-		localStorage.removeItem("expiresAt");
-		localStorage.removeItem("auth");
-		setUser(null);
-		setExpiresAt(null);
-		navigate("/");
+	// Check auth status on mount
+	useEffect(() => {
+		checkAuthStatus();
+	}, []);
+
+	// Check for Google callback
+	useEffect(() => {
+		if (user) {
+			console.log("User already authenticated");
+			return;
+		}
+
+		const params = new URLSearchParams(window.location.search);
+		const googleUserParam = params.get("user");
+
+		if (googleUserParam) {
+			try {
+				const googleAccount = JSON.parse(googleUserParam);
+				setUser(googleAccount.user);
+				setIsAuthenticated(true);
+
+				// Clear the URL params
+				window.history.replaceState(
+					{},
+					document.title,
+					window.location.pathname
+				);
+				navigate("/dashboard");
+			} catch (error) {
+				console.error("Error parsing Google user data:", error);
+			}
+		}
+	}, [user, navigate]);
+
+	const login = async (credentials: {
+		email: string;
+		password: string;
+		rememberMe?: boolean;
+	}) => {
+		try {
+			setIsLoading(true);
+			const response = await axios.post(
+				`${import.meta.env.VITE_BASEURL}/auth/login`,
+				credentials,
+				{ withCredentials: true }
+			);
+
+			setUser(response.data.user);
+			setIsAuthenticated(true);
+			navigate("/dashboard");
+		} catch (error) {
+			console.error("Login failed:", error);
+			throw error;
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const refreshToken = async () => {
+		try {
+			const response = await axios.post(
+				`${import.meta.env.VITE_BASEURL}/auth/refresh-token`,
+				{},
+				{ withCredentials: true }
+			);
+
+			// Update user data if needed
+			if (response.data.user) {
+				setUser(response.data.user);
+			}
+
+			return true;
+		} catch (error: any) {
+			console.error("Token refresh failed:", error);
+			// If refresh fails, log the user out
+			if (
+				error.response &&
+				(error.response.status === 401 || error.response.status === 403)
+			) {
+				logout();
+			}
+			return false;
+		}
+	};
+
+	useEffect(() => {
+		if (!isAuthenticated) return;
+
+		// Set up automatic token refresh - refresh every 45 minutes
+		// (assuming tokens expire after 1 hour)
+		const refreshInterval = setInterval(() => {
+			refreshToken();
+		}, 45 * 60 * 1000); // 45 minutes
+
+		return () => clearInterval(refreshInterval);
+	}, [isAuthenticated]);
+
+	const logout = async () => {
+		try {
+			await axios.post(
+				`${import.meta.env.VITE_BASEURL}/auth/logout`,
+				{},
+				{ withCredentials: true }
+			);
+		} catch (error) {
+			console.error("Logout API error:", error);
+		} finally {
+			// Clear state and local storage
+			setUser(null);
+			setIsAuthenticated(false);
+			localStorage.removeItem(USER_STORAGE_KEY);
+			localStorage.removeItem(AUTH_STATUS_KEY);
+			navigate("/");
+		}
 	};
 
 	const updateUser = (updatedUser: userTypes) => {
 		setUser(updatedUser);
-		localStorage.setItem("user", JSON.stringify(updatedUser));
 	};
 
-	// check for google callback
-	useEffect(() => {
-		if (user && token) {
-			console.log("NO NEED TO CHECK FOR GOOGLE USER");
-			return;
-		}
-
-		const params = new URLSearchParams(location.search);
-		const googleToken = params.get("user");
-		const googleAccount = googleToken ? JSON.parse(googleToken) : null;
-
-		if (googleToken && googleAccount) {
-			const expiryTime = new Date().getTime() + 3600 * 1000;
-			setToken(googleAccount.token);
-			setUser(googleAccount.user);
-
-			localStorage.setItem("user", JSON.stringify(googleAccount.user));
-			localStorage.setItem("expiresAt", JSON.stringify(expiryTime));
-			localStorage.setItem("auth", JSON.stringify(googleAccount.token));
-
-			navigate("/");
-			navigate("/dashboard");
-		}
-	}, [location, user, token, expiresAt, navigate]);
-
 	return (
-		<AuthContext.Provider value={{ user, token, login, logout, updateUser }}>
+		<AuthContext.Provider
+			value={{
+				user,
+				login,
+				logout,
+				refreshToken,
+				updateUser,
+				isAuthenticated,
+				isLoading,
+			}}
+		>
 			{children}
 		</AuthContext.Provider>
 	);

@@ -19,7 +19,7 @@ import Sidebar from "./components/Sidebar";
 
 const DashboardPage = () => {
 	const { user, logout } = useAuth();
-	const [renderPage, setRenderPage] = useState("settings");
+	const [renderPage, setRenderPage] = useState("analytics");
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
 	const menuItems = [
@@ -91,7 +91,7 @@ const DashboardPage = () => {
 					<UserProfileDropdown
 						user={user}
 						onLogout={logout}
-						balance={6348.22}
+						balance={user?.balance || 0}
 					/>
 				</div>
 			</div>
@@ -116,6 +116,7 @@ const DashboardPage = () => {
 					handlePageChange={handlePageChange}
 					isMobile={true}
 					onClose={() => setIsMobileSidebarOpen(false)}
+					currentItem={renderPage}
 				/>
 			</div>
 
@@ -125,6 +126,7 @@ const DashboardPage = () => {
 					items={menuItems}
 					handlePageChange={handlePageChange}
 					isMobile={false}
+					currentItem={renderPage}
 				/>
 			</div>
 
@@ -139,7 +141,7 @@ const DashboardPage = () => {
 							<UserProfileDropdown
 								user={user}
 								onLogout={logout}
-								balance={6348.22}
+								balance={user?.balance || 0}
 							/>
 						</div>
 					</div>

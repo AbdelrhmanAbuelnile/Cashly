@@ -86,9 +86,12 @@ const CashlyLanding = () => {
 						<a href="#" className="text-[#543A14]">
 							Features
 						</a>
-						<button className="bg-[#543A14] text-[#FFF0DC] px-4 py-2 rounded-lg">
+						<Link
+							to={"/signin"}
+							className="bg-[#543A14] text-[#FFF0DC] px-4 py-2 rounded-lg"
+						>
 							Get Started
-						</button>
+						</Link>
 					</div>
 				</motion.div>
 			)}

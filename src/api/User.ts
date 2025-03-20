@@ -8,6 +8,7 @@ interface SettingsData {
 	paymentDay?: number;
 	picture?: string;
 	salary?: number;
+	balance?: number;
 }
 
 const UserApi = {

@@ -11,6 +11,7 @@ type userTypes = {
 	paymentDay?: number;
 	currency: string;
 	currencySymbol: string;
+	balance?: number;
 } | null;
 
 export type { userTypes };

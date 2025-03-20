@@ -8,6 +8,7 @@ interface SidebarProps {
 		label: string;
 		key: string;
 	}>;
+	currentItem: string;
 	handlePageChange: (key: string) => void;
 	isMobile?: boolean;
 	onClose?: () => void;
@@ -15,11 +16,12 @@ interface SidebarProps {
 
 const Sidebar = ({
 	items,
+	currentItem,
 	handlePageChange,
 	isMobile = false,
 	onClose,
 }: SidebarProps) => {
-	const [activeItem, setActiveItem] = useState("settings");
+	const [activeItem, setActiveItem] = useState(currentItem);
 	const { logout } = useAuth();
 
 	return (

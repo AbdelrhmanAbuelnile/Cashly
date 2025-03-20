@@ -50,6 +50,7 @@ interface UserSettings {
 	paymentDay?: number;
 	currency: string;
 	currencySymbol: string;
+	balance?: number;
 }
 
 const SettingsPage: React.FC = () => {
@@ -66,6 +67,7 @@ const SettingsPage: React.FC = () => {
 		paymentDay: 15,
 		currency: "USD",
 		currencySymbol: "$",
+		balance: 0,
 	});
 
 	useEffect(() => {
@@ -78,6 +80,7 @@ const SettingsPage: React.FC = () => {
 				paymentDay: user.paymentDay,
 				currency: user.currency,
 				currencySymbol: user.currencySymbol,
+				balance: user.balance,
 			});
 		}
 	}, [user]);
@@ -131,11 +134,6 @@ const SettingsPage: React.FC = () => {
 	};
 
 	const handleSave = () => {
-		if (!token) {
-			console.error("No token found");
-			return;
-		}
-
 		setLoading(true);
 		UserApi.updateSettings(settings, token)
 			.then((res) => {
@@ -299,6 +297,20 @@ const SettingsPage: React.FC = () => {
 								))}
 							</SelectContent>
 						</Select>
+					</div>
+
+					<div className="space-y-2">
+						<Label className="text-[#543A14]">Balance</Label>
+						<div className="flex items-center">
+							<Input
+								name="balance"
+								type="number"
+								value={settings.balance || ""}
+								onChange={handleInputChange}
+								placeholder="Enter your current balance"
+								className="bg-[#FFF0DC] text-[#543A14] border-[#543A14]/30 focus:border-[#543A14]"
+							/>
+						</div>
 					</div>
 
 					<Button
