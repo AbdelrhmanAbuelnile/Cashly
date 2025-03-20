@@ -54,7 +54,7 @@ interface UserSettings {
 }
 
 const SettingsPage: React.FC = () => {
-	const { user, token, updateUser } = useAuth();
+	const { user, updateUser } = useAuth();
 	const showSnackbar = useSnackbar();
 	const [loading, setLoading] = useState(false);
 	const [showCropper, setShowCropper] = useState(false);
@@ -87,7 +87,6 @@ const SettingsPage: React.FC = () => {
 
 	useEffect(() => {
 		console.log(settings);
-		console.log("🚀 ~ handleSave ~ token:", token);
 	}, [settings]);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,7 +134,7 @@ const SettingsPage: React.FC = () => {
 
 	const handleSave = () => {
 		setLoading(true);
-		UserApi.updateSettings(settings, token)
+		UserApi.updateSettings(settings)
 			.then((res) => {
 				updateUser(res.data.user);
 				showSnackbar("Settings updated successfully", {

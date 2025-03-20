@@ -12,11 +12,9 @@ interface SettingsData {
 }
 
 const UserApi = {
-	updateSettings: (data: SettingsData, token: string) => {
+	updateSettings: (data: SettingsData) => {
 		const endpoint = `/user/settings`;
-		return axiosInstance.post(endpoint, data, {
-			headers: { Authorization: `Bearer ${token}` },
-		});
+		return axiosInstance.post(endpoint, data);
 	},
 };
 

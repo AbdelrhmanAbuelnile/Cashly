@@ -10,7 +10,6 @@ import {
 	Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import AuthApi from "../../api/Auth";
 import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "../../hooks/useSnackbar";
 
