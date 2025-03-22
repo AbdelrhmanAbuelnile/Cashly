@@ -1,16 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Wallet, Goal, Settings, Menu, X } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import UserProfileDropdown from "./components/UserProfileDropdown";
 import Sidebar from "./components/Sidebar";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 const DashboardPage = () => {
 	const { user, logout } = useAuth();
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 	const location = useLocation();
 	const currentPath = location.pathname.split("/").pop() || "dashboard";
-	const navigate = useNavigate();
 
 	const menuItems = [
 		// {
@@ -53,21 +52,21 @@ const DashboardPage = () => {
 		setIsMobileSidebarOpen(!isMobileSidebarOpen);
 	};
 
-	useEffect(() => {
-		if (user) {
-			const path = window.location.pathname;
-			// Only redirect if on landing page, login, or signup
-			if (
-				path === "/" ||
-				path === "/signin" ||
-				path === "/signup" ||
-				path === "/dashboard/" ||
-				path === "/dashboard"
-			) {
-				navigate("/dashboard/transactions"); // Navigate to home sub-route
-			}
-		}
-	}, [user, navigate]);
+	// useEffect(() => {
+	// 	if (user) {
+	// 		const path = window.location.pathname;
+	// 		// Only redirect if on landing page, login, or signup
+	// 		if (
+	// 			path === "/" ||
+	// 			path === "/signin" ||
+	// 			path === "/signup" ||
+	// 			path === "/dashboard/" ||
+	// 			path === "/dashboard"
+	// 		) {
+	// 			navigate("/dashboard/transactions"); // Navigate to home sub-route
+	// 		}
+	// 	}
+	// }, [user, navigate]);
 
 	return (
 		<div className="min-h-screen flex flex-col md:flex-row bg-[#FFF0DC] text-[#543A14]">
