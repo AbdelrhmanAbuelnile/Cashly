@@ -173,7 +173,9 @@ const ContributionDialog: React.FC<ContributionDialogProps> = ({
 							</Label>
 							<Select
 								value={formData.type}
-								onValueChange={(value) => handleSelectChange("type", value)}
+								onValueChange={(value: string) =>
+									handleSelectChange("type", value)
+								}
 							>
 								<SelectTrigger>
 									<SelectValue placeholder="Select type" />
@@ -206,7 +208,7 @@ const ContributionDialog: React.FC<ContributionDialogProps> = ({
 							</Label>
 							<Select
 								value={formData.transactionIcon}
-								onValueChange={(value) =>
+								onValueChange={(value: string) =>
 									handleSelectChange("transactionIcon", value)
 								}
 							>

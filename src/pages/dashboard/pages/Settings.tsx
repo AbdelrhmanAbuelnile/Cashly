@@ -274,7 +274,7 @@ const SettingsPage: React.FC = () => {
 						<Label className="text-[#543A14]">Payment Day</Label>
 						<Select
 							value={settings.paymentDay?.toString()}
-							onValueChange={(value) =>
+							onValueChange={(value: string) =>
 								setSettings((prev) => ({
 									...prev,
 									paymentDay: Number(value),

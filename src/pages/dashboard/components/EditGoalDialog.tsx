@@ -212,7 +212,7 @@ const EditGoalDialog: React.FC<EditGoalDialogProps> = ({
 							</Label>
 							<Select
 								value={formData.goalStatus}
-								onValueChange={(value) =>
+								onValueChange={(value: string) =>
 									handleSelectChange("goalStatus", value)
 								}
 							>

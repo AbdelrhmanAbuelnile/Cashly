@@ -205,7 +205,9 @@ function NewGoal() {
 							<Label htmlFor="icon">Goal Icon</Label>
 							<Select
 								value={formData.icon}
-								onValueChange={(value) => handleSelectChange("icon", value)}
+								onValueChange={(value: string) =>
+									handleSelectChange("icon", value)
+								}
 							>
 								<SelectTrigger>
 									<SelectValue placeholder="Select an icon" />
@@ -290,7 +292,9 @@ function NewGoal() {
 							<Label htmlFor="status">Status</Label>
 							<Select
 								value={formData.status}
-								onValueChange={(value) => handleSelectChange("status", value)}
+								onValueChange={(value: string) =>
+									handleSelectChange("status", value)
+								}
 							>
 								<SelectTrigger>
 									<SelectValue placeholder="Select status" />

@@ -267,7 +267,9 @@ function NewTransaction() {
 							<Label htmlFor="type">Transaction Type *</Label>
 							<Select
 								value={formData.transaction.type}
-								onValueChange={(value) => handleSelectChange("type", value)}
+								onValueChange={(value: string) =>
+									handleSelectChange("type", value)
+								}
 							>
 								<SelectTrigger className={errors.type ? "border-red-500" : ""}>
 									<SelectValue placeholder="Select transaction type" />
@@ -330,7 +332,7 @@ function NewTransaction() {
 							<Label htmlFor="transactionIcon">Category Icon</Label>
 							<Select
 								value={formData.transaction.transactionIcon}
-								onValueChange={(value) =>
+								onValueChange={(value: string) =>
 									handleSelectChange("transactionIcon", value)
 								}
 							>
@@ -367,7 +369,9 @@ function NewTransaction() {
 								<Label htmlFor="goalId">Associate with Goal (optional)</Label>
 								<Select
 									value={formData.goalId || ""}
-									onValueChange={(value) => handleSelectChange("goalId", value)}
+									onValueChange={(value: string) =>
+										handleSelectChange("goalId", value)
+									}
 								>
 									<SelectTrigger>
 										<SelectValue placeholder="Select a goal (optional)" />
