@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { userTypes } from "../types/userTypes";
 import axios from "axios";
-
+import posthog from "posthog-js";
 // Configure axios to include credentials in requests
 axios.defaults.withCredentials = true;
 
@@ -123,6 +123,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	// 		checkAuthStatus();
 	// 	}
 	// }, []);
+	useEffect(() => {
+		if (user) {
+			posthog.identify(user.id, {
+				email: user.email,
+				name: user.fullName,
+				role: user.picture,
+			});
+		}
+	}, []);
 
 	// Check for Google callback
 	useEffect(() => {
