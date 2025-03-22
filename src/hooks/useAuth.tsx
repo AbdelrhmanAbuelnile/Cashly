@@ -119,7 +119,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	// Check auth status on mount
 	useEffect(() => {
-		checkAuthStatus();
+		if (user && isAuthenticated) {
+			checkAuthStatus();
+		}
 	}, []);
 
 	// Check for Google callback
