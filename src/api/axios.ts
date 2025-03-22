@@ -22,7 +22,7 @@ axiosInstance.interceptors.response.use(
 			(error.response.status === 401 || error.response.status === 403)
 		) {
 			// Redirect to login page
-			window.location.href = "/";
+			window.location.href = "/signin";
 		}
 		return Promise.reject(error);
 	}
