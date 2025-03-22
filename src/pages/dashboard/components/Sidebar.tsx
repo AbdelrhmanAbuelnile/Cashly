@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { LogOut, X } from "lucide-react";
 import { useAuth } from "../../../hooks/useAuth";
+import { NavLink } from "react-router-dom";
 
 interface SidebarProps {
 	items: Array<{
 		icon: React.ComponentType<{ className?: string }>;
 		label: string;
 		key: string;
+		path?: string;
 	}>;
 	currentItem: string;
 	handlePageChange: (key: string) => void;
@@ -64,11 +66,10 @@ const Sidebar = ({
 							className={`
                 flex 
                 items-center 
-                p-3 
-                rounded-lg 
                 cursor-pointer 
                 transition-all 
                 duration-200 
+								rounded-lg
                 ${
 									activeItem === item.key
 										? "bg-[#543A14] text-[#FFF0DC]"
@@ -80,8 +81,13 @@ const Sidebar = ({
 								handlePageChange(item.key);
 							}}
 						>
-							<item.icon className="h-5 w-5 mr-3" />
-							<span className="text-md">{item.label}</span>
+							<NavLink
+								to={item.path || "#"}
+								className="flex items-center w-full p-3 rounded-lg"
+							>
+								<item.icon className="h-5 w-5 mr-3" />
+								<span className="text-md">{item.label}</span>
+							</NavLink>
 						</li>
 					))}
 				</ul>

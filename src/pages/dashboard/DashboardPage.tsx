@@ -1,80 +1,73 @@
-import { useState } from "react";
-import {
-	Wallet,
-	Goal,
-	TrendingUp,
-	Home,
-	Settings,
-	Menu,
-	X,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Wallet, Goal, Settings, Menu, X } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import UserProfileDropdown from "./components/UserProfileDropdown";
-import Dashboard from "./pages/Home";
-import Analytics from "./pages/Analytics";
-import Transactions from "./pages/Transactions";
-import Goals from "./pages/Goals";
-import SettingsPage from "./pages/Settings";
 import Sidebar from "./components/Sidebar";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {
 	const { user, logout } = useAuth();
-	const [renderPage, setRenderPage] = useState("analytics");
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+	const location = useLocation();
+	const currentPath = location.pathname.split("/").pop() || "dashboard";
+	const navigate = useNavigate();
 
 	const menuItems = [
-		{
-			icon: Home,
-			label: "Dashboard",
-			key: "dashboard",
-		},
-		{
-			icon: TrendingUp,
-			label: "Analytics",
-			key: "analytics",
-		},
+		// {
+		// 	icon: Home,
+		// 	label: "Dashboard",
+		// 	key: "dashboard",
+		// 	path: "/dashboard/home",
+		// },
+		// {
+		// 	icon: TrendingUp,
+		// 	label: "Analytics",
+		// 	key: "analytics",
+		// 	path: "/dashboard/analytics",
+		// },
 		{
 			icon: Wallet,
 			label: "Transactions",
 			key: "transactions",
+			path: "/dashboard/transactions",
 		},
 		{
 			icon: Goal,
 			label: "Goals",
 			key: "goals",
+			path: "/dashboard/goals",
 		},
 		{
 			icon: Settings,
 			label: "Settings",
 			key: "settings",
+			path: "/dashboard/settings",
 		},
 	];
 
-	const renderComponent = () => {
-		switch (renderPage) {
-			case "dashboard":
-				return <Dashboard />;
-			case "analytics":
-				return <Analytics />;
-			case "transactions":
-				return <Transactions />;
-			case "goals":
-				return <Goals />;
-			case "settings":
-				return <SettingsPage />;
-			default:
-				return <Dashboard />;
-		}
-	};
-
-	const handlePageChange = (key: string) => {
-		setRenderPage(key);
+	const handlePageChange = () => {
 		setIsMobileSidebarOpen(false);
 	};
 
 	const toggleMobileSidebar = () => {
 		setIsMobileSidebarOpen(!isMobileSidebarOpen);
 	};
+
+	useEffect(() => {
+		if (user) {
+			const path = window.location.pathname;
+			// Only redirect if on landing page, login, or signup
+			if (
+				path === "/" ||
+				path === "/signin" ||
+				path === "/signup" ||
+				path === "/dashboard/" ||
+				path === "/dashboard"
+			) {
+				navigate("/dashboard/transactions"); // Navigate to home sub-route
+			}
+		}
+	}, [user, navigate]);
 
 	return (
 		<div className="min-h-screen flex flex-col md:flex-row bg-[#FFF0DC] text-[#543A14]">
@@ -116,7 +109,7 @@ const DashboardPage = () => {
 					handlePageChange={handlePageChange}
 					isMobile={true}
 					onClose={() => setIsMobileSidebarOpen(false)}
-					currentItem={renderPage}
+					currentItem={currentPath}
 				/>
 			</div>
 
@@ -126,7 +119,7 @@ const DashboardPage = () => {
 					items={menuItems}
 					handlePageChange={handlePageChange}
 					isMobile={false}
-					currentItem={renderPage}
+					currentItem={currentPath}
 				/>
 			</div>
 
@@ -135,7 +128,7 @@ const DashboardPage = () => {
 				<div className="lg:container w-full mx-auto">
 					<div className="w-full flex justify-between items-center mb-6">
 						<h1 className="text-2xl md:text-3xl font-bold capitalize">
-							{renderPage}
+							{currentPath}
 						</h1>
 						<div className="hidden md:block">
 							<UserProfileDropdown
@@ -145,7 +138,7 @@ const DashboardPage = () => {
 							/>
 						</div>
 					</div>
-					{renderComponent()}
+					<Outlet />
 				</div>
 			</div>
 		</div>

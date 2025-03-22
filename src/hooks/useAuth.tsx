@@ -28,6 +28,13 @@ interface AuthProviderProps {
 	children: React.ReactNode;
 }
 
+interface errorType {
+	response?: {
+		status?: number;
+	};
+	message?: string;
+}
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
@@ -39,6 +46,13 @@ export const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
+	let baseUrl: string | undefined;
+
+	if (import.meta.env.VITE_MODE === "dev") {
+		baseUrl = import.meta.env.VITE_BASEURL_DEV;
+	} else if (import.meta.env.VITE_MODE === "prod") {
+		baseUrl = import.meta.env.VITE_BASEURL;
+	}
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -70,23 +84,23 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const checkAuthStatus = async () => {
 		try {
 			// Even if we have local storage data, verify with the server
-			const response = await axios.get(
-				`${import.meta.env.VITE_BASEURL}/user/profile`,
-				{ withCredentials: true }
-			);
+			const response = await axios.get(`${baseUrl}/user/profile`, {
+				withCredentials: true,
+			});
 
 			if (response.status === 200) {
 				setUser(response.data.user);
 				setIsAuthenticated(true);
 			}
-		} catch (error: any) {
-			console.log("Server validation error:", error.message);
+		} catch (error: unknown) {
+			const err = error as errorType;
+			console.log("Server validation error:", err?.message);
 
 			// Only clear authentication if it's an auth error (401/403)
 			// This preserves local session during network issues
 			if (
-				error.response &&
-				(error.response.status === 401 || error.response.status === 403)
+				err?.response &&
+				(err?.response?.status === 401 || err?.response?.status === 403)
 			) {
 				console.log("Authentication error - clearing session");
 				setUser(null);
@@ -144,11 +158,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	}) => {
 		try {
 			setIsLoading(true);
-			const response = await axios.post(
-				`${import.meta.env.VITE_BASEURL}/auth/login`,
-				credentials,
-				{ withCredentials: true }
-			);
+			const response = await axios.post(`${baseUrl}/auth/login`, credentials, {
+				withCredentials: true,
+			});
 
 			setUser(response.data.user);
 			setIsAuthenticated(true);
@@ -164,7 +176,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 	const refreshToken = async () => {
 		try {
 			const response = await axios.post(
-				`${import.meta.env.VITE_BASEURL}/auth/refresh-token`,
+				`${baseUrl}/auth/refresh-token`,
 				{},
 				{ withCredentials: true }
 			);
@@ -175,12 +187,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			}
 
 			return true;
-		} catch (error: any) {
-			console.error("Token refresh failed:", error);
-			// If refresh fails, log the user out
+		} catch (error: unknown) {
+			const err = error as errorType;
+			console.error("Token refresh failed:", err);
+
+			// Only clear authentication if it's an auth error (401/403)
+			// This preserves local session during network issues
 			if (
-				error.response &&
-				(error.response.status === 401 || error.response.status === 403)
+				err?.response &&
+				(err?.response?.status === 401 || err?.response?.status === 403)
 			) {
 				logout();
 			}
@@ -202,11 +217,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 	const logout = async () => {
 		try {
-			await axios.post(
-				`${import.meta.env.VITE_BASEURL}/auth/logout`,
-				{},
-				{ withCredentials: true }
-			);
+			await axios.post(`${baseUrl}/auth/logout`, {}, { withCredentials: true });
 		} catch (error) {
 			console.error("Logout API error:", error);
 		} finally {
