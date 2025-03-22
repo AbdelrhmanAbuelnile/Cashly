@@ -80,49 +80,49 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		localStorage.setItem(AUTH_STATUS_KEY, JSON.stringify(isAuthenticated));
 	}, [isAuthenticated]);
 
-	// Function to check authentication status
-	const checkAuthStatus = async () => {
-		try {
-			// Even if we have local storage data, verify with the server
-			const response = await axios.get(`${baseUrl}/user/profile`, {
-				withCredentials: true,
-			});
+	// // Function to check authentication status
+	// const checkAuthStatus = async () => {
+	// 	try {
+	// 		// Even if we have local storage data, verify with the server
+	// 		const response = await axios.get(`${baseUrl}/user/profile`, {
+	// 			withCredentials: true,
+	// 		});
 
-			if (response.status === 200) {
-				setUser(response.data.user);
-				setIsAuthenticated(true);
-			}
-		} catch (error: unknown) {
-			const err = error as errorType;
-			console.log("Server validation error:", err?.message);
+	// 		if (response.status === 200) {
+	// 			setUser(response.data.user);
+	// 			setIsAuthenticated(true);
+	// 		}
+	// 	} catch (error: unknown) {
+	// 		const err = error as errorType;
+	// 		console.log("Server validation error:", err?.message);
 
-			// Only clear authentication if it's an auth error (401/403)
-			// This preserves local session during network issues
-			if (
-				err?.response &&
-				(err?.response?.status === 401 || err?.response?.status === 403)
-			) {
-				console.log("Authentication error - clearing session");
-				setUser(null);
-				setIsAuthenticated(false);
-				localStorage.removeItem(USER_STORAGE_KEY);
-				localStorage.removeItem(AUTH_STATUS_KEY);
-			} else {
-				// For network errors, keep the existing state
-				console.log("Network or other error - maintaining existing session");
-				// Keep using localStorage values (already loaded in useState)
-			}
-		} finally {
-			setIsLoading(false);
-		}
-	};
+	// 		// Only clear authentication if it's an auth error (401/403)
+	// 		// This preserves local session during network issues
+	// 		if (
+	// 			err?.response &&
+	// 			(err?.response?.status === 401 || err?.response?.status === 403)
+	// 		) {
+	// 			console.log("Authentication error - clearing session");
+	// 			setUser(null);
+	// 			setIsAuthenticated(false);
+	// 			localStorage.removeItem(USER_STORAGE_KEY);
+	// 			localStorage.removeItem(AUTH_STATUS_KEY);
+	// 		} else {
+	// 			// For network errors, keep the existing state
+	// 			console.log("Network or other error - maintaining existing session");
+	// 			// Keep using localStorage values (already loaded in useState)
+	// 		}
+	// 	} finally {
+	// 		setIsLoading(false);
+	// 	}
+	// };
 
-	// Check auth status on mount
-	useEffect(() => {
-		if (user && isAuthenticated) {
-			checkAuthStatus();
-		}
-	}, []);
+	// // Check auth status on mount
+	// useEffect(() => {
+	// 	if (user && isAuthenticated) {
+	// 		checkAuthStatus();
+	// 	}
+	// }, []);
 
 	// Check for Google callback
 	useEffect(() => {
