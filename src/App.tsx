@@ -1,9 +1,7 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import CashlyLanding from "./pages/home/CashlyLanding";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
-import { useAuth } from "./hooks/useAuth";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import Goals from "./pages/dashboard/pages/Goals";
 import Transactions from "./pages/dashboard/pages/Transactions";
@@ -14,25 +12,6 @@ import TransactionDetail from "./pages/dashboard/pages/TransactionDetail";
 import NewTransaction from "./pages/dashboard/pages/NewTransaction";
 
 const App = () => {
-	const { user } = useAuth();
-	const navigate = useNavigate();
-
-	useEffect(() => {
-		if (user) {
-			const path = window.location.pathname;
-			// Only redirect if on landing page, login, or signup
-			if (
-				path === "/" ||
-				path === "/signin" ||
-				path === "/signup" ||
-				path === "/dashboard/" ||
-				path === "/dashboard"
-			) {
-				navigate("/dashboard/transactions"); // Navigate to home sub-route
-			}
-		}
-	}, [user, navigate]);
-
 	return (
 		<Routes>
 			{/* Public Routes */}
