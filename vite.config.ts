@@ -30,7 +30,7 @@ export default defineConfig({
 						name: "Where did my money go?",
 						short_name: "Expenses",
 						description: "View your expenses",
-						url: "/expenses?source=pwa",
+						url: "/dashboard/transactions?source=pwa",
 						icons: [
 							{
 								src: "/images/android-chrome-192x192.png",
@@ -42,7 +42,7 @@ export default defineConfig({
 						name: "How much did I save?",
 						short_name: "Savings",
 						description: "View your savings",
-						url: "/savings?source=pwa",
+						url: "/dashboard/goals?source=pwa",
 						icons: [
 							{
 								src: "/images/android-chrome-192x192.png",

@@ -192,9 +192,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 				{ withCredentials: true }
 			);
 
-			// Update user data if needed
+			// Update user data, including balance if returned
 			if (response.data.user) {
-				setUser(response.data.user);
+				setUser((prevUser) => ({
+					...prevUser,
+					...response.data.user,
+				}));
 			}
 
 			return true;
@@ -202,14 +205,17 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			const err = error as errorType;
 			console.error("Token refresh failed:", err);
 
-			// Only clear authentication if it's an auth error (401/403)
-			// This preserves local session during network issues
+			// Clear authentication if it's an auth error (401/403)
 			if (
 				err?.response &&
 				(err?.response?.status === 401 || err?.response?.status === 403)
 			) {
-				logout();
+				// Call logout to clear everything
+				await logout();
+				return false;
 			}
+
+			// For network errors or other issues, return false
 			return false;
 		}
 	};
@@ -240,6 +246,18 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 			navigate("/");
 		}
 	};
+
+	useEffect(() => {
+		if (!isAuthenticated) return;
+
+		// Set up automatic token refresh - refresh every 45 minutes
+		// (assuming tokens expire after 1 hour)
+		const refreshInterval = setInterval(() => {
+			refreshToken();
+		}, 45 * 60 * 1000); // 45 minutes
+
+		return () => clearInterval(refreshInterval);
+	}, [isAuthenticated]);
 
 	const updateUser = (updatedUser: userTypes) => {
 		setUser(updatedUser);
