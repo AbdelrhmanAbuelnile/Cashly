@@ -10,8 +10,22 @@ import GoalDetail from "./pages/dashboard/pages/GoalDetail";
 import NewGoal from "./pages/dashboard/pages/NewGoal";
 import TransactionDetail from "./pages/dashboard/pages/TransactionDetail";
 import NewTransaction from "./pages/dashboard/pages/NewTransaction";
+import { useAuth } from "./hooks/useAuth";
+import { useEffect } from "react";
 
 const App = () => {
+	const { isAuthenticated, user } = useAuth();
+
+	useEffect(() => {
+		if (
+			isAuthenticated &&
+			user &&
+			!window.location.pathname.includes("dashboard")
+		) {
+			window.location.href = "/dashboard/transactions";
+		}
+	}, [isAuthenticated, user]);
+
 	return (
 		<Routes>
 			{/* Public Routes */}

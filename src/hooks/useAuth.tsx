@@ -155,7 +155,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 					document.title,
 					window.location.pathname
 				);
-				navigate("/dashboard");
+				navigate("/dashboard/transactions");
 			} catch (error) {
 				console.error("Error parsing Google user data:", error);
 			}
@@ -175,7 +175,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
 			setUser(response.data.user);
 			setIsAuthenticated(true);
-			navigate("/dashboard");
+			navigate("/dashboard/transactions");
 		} catch (error) {
 			console.error("Login failed:", error);
 			throw error;
