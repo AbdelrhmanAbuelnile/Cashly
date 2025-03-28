@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import {
 	ChevronLeft,
-	Edit,
+	// Edit,
 	Calendar,
 	Trash2,
 	ArrowUpRight,
@@ -26,9 +26,13 @@ import TransactionsApi from "@/api/Transactions";
 import { useAuth } from "@/hooks/useAuth";
 // import { useSnackbar } from "@/hooks/useSnackbar";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import DeleteTransactionDialog from "../components/DeleteTransactionDialog";
+import { useSnackbar } from "@/hooks/useSnackbar";
+// import EditTransactionDialog from "../components/EditTransactionDialog";
 
 interface Transaction {
 	_id: string;
+	user: string;
 	name: string;
 	amount: number;
 	type: string;
@@ -77,8 +81,8 @@ function TransactionDetail() {
 	const { transactionId } = useParams();
 	const { user } = useAuth();
 	// const [editDialogOpen, setEditDialogOpen] = useState(false);
-	// const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-	// const showSnackbar = useSnackbar();
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const showSnackbar = useSnackbar();
 
 	// State for the transaction data
 	const [transaction, setTransaction] = useState<Transaction | null>(null);
@@ -98,18 +102,14 @@ function TransactionDetail() {
 
 	// Handle edit transaction
 	// const handleEditTransaction = (updatedTransaction: Partial<Transaction>) => {
-	// 	console.log("Updating transaction:", updatedTransaction);
-
 	// 	const payload = {
-	// 		transaction: {
-	// 			name: updatedTransaction.name || "",
-	// 			amount: updatedTransaction.amount || 0,
-	// 			type: updatedTransaction.type || "expense",
-	// 			description: updatedTransaction.description || "",
-	// 			transactionIcon: updatedTransaction.transactionIcon || "",
-	// 		},
-	// 		goalId: updatedTransaction.goalId || undefined,
+	// 		name: updatedTransaction.name || "",
+	// 		amount: updatedTransaction.amount || 0,
+	// 		type: updatedTransaction.type || "expense",
+	// 		description: updatedTransaction.description || "",
+	// 		icon: updatedTransaction.transactionIcon || "",
 	// 	};
+	// 	console.log("🚀 ~ handleEditTransaction ~ payload:", payload);
 
 	// 	TransactionsApi.updateTransaction(transactionId || "", payload)
 	// 		.then((response) => {
@@ -132,26 +132,26 @@ function TransactionDetail() {
 	// };
 
 	// Handle transaction deletion
-	// const handleDeleteTransaction = () => {
-	// 	console.log("Deleting transaction:", transactionId);
-	// 	TransactionsApi.deleteTransaction(transactionId || "")
-	// 		.then(() => {
-	// 			showSnackbar("Transaction deleted successfully", {
-	// 				type: "success",
-	// 				title: "Success",
-	// 				duration: 5000,
-	// 			});
-	// 			window.history.back();
-	// 		})
-	// 		.catch((error) => {
-	// 			console.log("🚀 ~ handleDeleteTransaction ~ error:", error);
-	// 			showSnackbar("Failed to delete transaction", {
-	// 				type: "error",
-	// 				title: "Error",
-	// 				duration: 5000,
-	// 			});
-	// 		});
-	// };
+	const handleDeleteTransaction = () => {
+		console.log("Deleting transaction:", transactionId);
+		TransactionsApi.deleteTransaction(transactionId || "")
+			.then(() => {
+				showSnackbar("Transaction deleted successfully", {
+					type: "success",
+					title: "Success",
+					duration: 5000,
+				});
+				window.history.back();
+			})
+			.catch((error) => {
+				console.log("🚀 ~ handleDeleteTransaction ~ error:", error);
+				showSnackbar("Failed to delete transaction", {
+					type: "error",
+					title: "Error",
+					duration: 5000,
+				});
+			});
+	};
 
 	// Handle loading state
 	if (isLoading) {
@@ -184,17 +184,17 @@ function TransactionDetail() {
 						<ChevronLeft className="h-4 w-4 mr-1" />
 						Back to Transactions
 					</button>
-					<div className="flex justify-between items-center">
+					{/* <div className="flex justify-between items-center">
 						<h1 className="text-3xl font-bold">{transaction.name}</h1>
 						<Button
 							variant="outline"
 							size="sm"
 							className="flex items-center gap-1"
-							// onClick={() => setEditDialogOpen(true)}
+							onClick={() => setEditDialogOpen(true)}
 						>
 							<Edit className="h-4 w-4" /> Edit
 						</Button>
-					</div>
+					</div> */}
 				</div>
 
 				{/* Main transaction information card */}
@@ -285,7 +285,7 @@ function TransactionDetail() {
 					<Button
 						variant="destructive"
 						className="w-full flex items-center justify-center gap-2"
-						// onClick={() => setDeleteDialogOpen(true)}
+						onClick={() => setDeleteDialogOpen(true)}
 					>
 						<Trash2 className="h-4 w-4" /> Delete Transaction
 					</Button>
@@ -296,15 +296,16 @@ function TransactionDetail() {
 					open={editDialogOpen}
 					onOpenChange={setEditDialogOpen}
 					onSubmit={handleEditTransaction}
-					// transaction={transaction}
-				/>
+					transaction={transaction}
+				/> */}
 
 				<DeleteTransactionDialog
 					open={deleteDialogOpen}
 					onOpenChange={setDeleteDialogOpen}
 					onConfirm={handleDeleteTransaction}
+					transactionName={transaction.name}
 					// transactionName={transaction.name}
-				/> */}
+				/>
 			</div>
 		)
 	);

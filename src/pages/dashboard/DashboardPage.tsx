@@ -9,7 +9,34 @@ const DashboardPage = () => {
 	const { user, logout } = useAuth();
 	const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 	const location = useLocation();
-	const currentPath = location.pathname.split("/").pop() || "dashboard";
+
+	// Improved path determination that handles detail routes
+	const getPageInfo = () => {
+		const pathSegments = location.pathname.split("/").filter(Boolean);
+
+		// Default case
+		if (pathSegments.length <= 1) return "dashboard";
+
+		// Handle main sections
+		const mainSection = pathSegments[1];
+
+		// Handle detail pages like /transactions/:id
+		if (pathSegments.length > 2 && mainSection === "transactions") {
+			return { path: mainSection, title: "Transaction Details" };
+		}
+
+		// Handle other potential detail pages
+		if (pathSegments.length > 2 && mainSection === "goals") {
+			return { path: mainSection, title: "Goal Details" };
+		}
+
+		// Regular pages
+		return { path: mainSection, title: mainSection };
+	};
+
+	const pageInfo = getPageInfo();
+	const currentPath = typeof pageInfo === "string" ? pageInfo : pageInfo.path;
+	const pageTitle = typeof pageInfo === "string" ? pageInfo : pageInfo.title;
 
 	const menuItems = [
 		// {
@@ -127,7 +154,7 @@ const DashboardPage = () => {
 				<div className="lg:container w-full mx-auto">
 					<div className="w-full flex justify-between items-center mb-6">
 						<h1 className="text-2xl md:text-3xl font-bold capitalize">
-							{currentPath}
+							{pageTitle}
 						</h1>
 						<div className="hidden md:block">
 							<UserProfileDropdown

@@ -310,7 +310,10 @@ const SignupPage = () => {
 						className="mr-2 text-[#F0BB78] focus:ring-[#F0BB78]"
 					/>
 					<label htmlFor="terms" className="text-sm text-[#543A14]/70">
-						I agree to the Terms and Conditions
+						I agree to the{" "}
+						<Link to={"/terms"} className="text-[#F0BB78] hover:underline">
+							Terms and Conditions
+						</Link>
 					</label>
 				</div>
 

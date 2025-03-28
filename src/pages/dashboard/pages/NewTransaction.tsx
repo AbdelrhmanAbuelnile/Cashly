@@ -233,12 +233,12 @@ function NewTransaction() {
 		{
 			value: "expense",
 			label: "Expense",
-			icon: <ArrowUpRight className="h-5 w-5 text-red-500" />,
+			icon: <ArrowDownLeft className="h-5 w-5 text-red-500" />,
 		},
 		{
 			value: "income",
 			label: "Income",
-			icon: <ArrowDownLeft className="h-5 w-5 text-green-500" />,
+			icon: <ArrowUpRight className="h-5 w-5 text-green-500" />,
 		},
 	];
 
@@ -317,7 +317,7 @@ function NewTransaction() {
 									type="number"
 									min="0.01"
 									step="0.01"
-									value={formData.transaction.amount}
+									value={formData.transaction.amount || ""}
 									onChange={handleInputChange}
 									className={`pl-8 ${errors.amount ? "border-red-500" : ""}`}
 									placeholder="0.00"

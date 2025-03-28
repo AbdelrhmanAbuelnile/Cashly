@@ -12,6 +12,7 @@ import TransactionDetail from "./pages/dashboard/pages/TransactionDetail";
 import NewTransaction from "./pages/dashboard/pages/NewTransaction";
 import { useAuth } from "./hooks/useAuth";
 import { useEffect } from "react";
+import TermsAndConditionsPage from "./pages/dashboard/TermsAndConditionsPage";
 
 const App = () => {
 	const { isAuthenticated, user } = useAuth();
@@ -32,6 +33,8 @@ const App = () => {
 			<Route path="/" element={<CashlyLanding />} />
 			<Route path="/signin" element={<LoginPage />} />
 			<Route path="/signup" element={<SignupPage />} />
+			<Route path="/terms" element={<TermsAndConditionsPage />} />
+
 			{/* Protected Route */}
 			<Route path="/dashboard" element={<DashboardPage />}>
 				{/* <Route path="home" element={<Dashboard />} /> */}
