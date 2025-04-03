@@ -17,6 +17,15 @@ import { formatDate } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+	Pagination,
+	PaginationContent,
+	PaginationEllipsis,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
 	Select,
 	SelectContent,
 	SelectItem,
@@ -53,7 +62,11 @@ function Transactions() {
 	const { data, isLoading, isError, error } = useQuery({
 		queryKey: ["transactions", searchParams],
 		queryFn: () => TransactionsApi.getMyTransactions(searchParams),
-		select: (response) => response.data,
+		select: (response) => ({
+			...response.data,
+			hasNextPage: response.data.transactions.length === searchParams.limit,
+			totalPages: Math.ceil(response.data.totalCount / searchParams.limit) || 1,
+		}),
 	});
 
 	// Function to render icon based on transactionIcon string
@@ -319,7 +332,120 @@ function Transactions() {
 			</div>
 
 			{/* Pagination controls could be added here */}
+			<div className="mt-8 mb-16">
+				<Pagination>
+					<PaginationContent>
+						<PaginationItem>
+							<PaginationPrevious
+								onClick={() =>
+									searchParams.page > 1 &&
+									setSearchParams((prev) => ({ ...prev, page: prev.page - 1 }))
+								}
+								className={
+									searchParams.page <= 1
+										? "pointer-events-none opacity-50"
+										: "cursor-pointer"
+								}
+							/>
+						</PaginationItem>
 
+						{/* First page */}
+						{searchParams.page > 2 && (
+							<PaginationItem>
+								<PaginationLink
+									onClick={() =>
+										setSearchParams((prev) => ({ ...prev, page: 1 }))
+									}
+									isActive={searchParams.page === 1}
+								>
+									1
+								</PaginationLink>
+							</PaginationItem>
+						)}
+
+						{/* Ellipsis if needed */}
+						{searchParams.page > 3 && (
+							<PaginationItem>
+								<PaginationEllipsis />
+							</PaginationItem>
+						)}
+
+						{/* Previous page if not on first page */}
+						{searchParams.page > 1 && (
+							<PaginationItem>
+								<PaginationLink
+									onClick={() =>
+										setSearchParams((prev) => ({
+											...prev,
+											page: prev.page - 1,
+										}))
+									}
+								>
+									{searchParams.page - 1}
+								</PaginationLink>
+							</PaginationItem>
+						)}
+
+						{/* Current page */}
+						<PaginationItem>
+							<PaginationLink isActive>{searchParams.page}</PaginationLink>
+						</PaginationItem>
+
+						{/* Next page if there are more transactions */}
+						{data?.hasNextPage && (
+							<PaginationItem>
+								<PaginationLink
+									onClick={() =>
+										setSearchParams((prev) => ({
+											...prev,
+											page: prev.page + 1,
+										}))
+									}
+								>
+									{searchParams.page + 1}
+								</PaginationLink>
+							</PaginationItem>
+						)}
+
+						{/* Ellipsis if needed */}
+						{data?.totalPages && searchParams.page < data.totalPages - 2 && (
+							<PaginationItem>
+								<PaginationEllipsis />
+							</PaginationItem>
+						)}
+
+						{/* Last page if not current */}
+						{data?.totalPages && searchParams.page < data.totalPages - 1 && (
+							<PaginationItem>
+								<PaginationLink
+									onClick={() =>
+										setSearchParams((prev) => ({
+											...prev,
+											page: data.totalPages,
+										}))
+									}
+								>
+									{data.totalPages}
+								</PaginationLink>
+							</PaginationItem>
+						)}
+
+						<PaginationItem>
+							<PaginationNext
+								onClick={() =>
+									data?.hasNextPage &&
+									setSearchParams((prev) => ({ ...prev, page: prev.page + 1 }))
+								}
+								className={
+									!data?.hasNextPage
+										? "pointer-events-none opacity-50"
+										: "cursor-pointer"
+								}
+							/>
+						</PaginationItem>
+					</PaginationContent>
+				</Pagination>
+			</div>
 			{/* Add New Transaction Button (fixed to bottom right) */}
 			<div className="fixed bottom-6 right-6 z-10">
 				<NewTransactionButton />
