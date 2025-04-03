@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://cashly-nine.vercel.app/sitemap.xml
