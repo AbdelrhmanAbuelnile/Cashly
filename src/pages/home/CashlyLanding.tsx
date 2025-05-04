@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Wallet, Goal, BarChart, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ReactGA from "react-ga4";
 
 const CashlyLanding = () => {
