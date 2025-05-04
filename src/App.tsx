@@ -13,6 +13,7 @@ import NewTransaction from "./pages/dashboard/pages/NewTransaction";
 import { useAuth } from "./hooks/useAuth";
 import { useEffect } from "react";
 import TermsAndConditionsPage from "./pages/dashboard/TermsAndConditionsPage";
+import ReactGA from "react-ga4";
 
 const App = () => {
 	const { isAuthenticated, user } = useAuth();
@@ -26,6 +27,10 @@ const App = () => {
 			window.location.href = "/dashboard/transactions";
 		}
 	}, [isAuthenticated, user]);
+
+	const trackingID = "G-ERV86Y5KSB";
+
+	ReactGA.initialize(trackingID);
 
 	return (
 		<Routes>

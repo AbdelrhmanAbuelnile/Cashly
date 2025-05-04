@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	PlusCircle,
@@ -33,6 +33,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
+import ReactGA from "react-ga4";
 
 interface Transaction {
 	_id: string;
@@ -117,23 +118,39 @@ function Transactions() {
 		}));
 	};
 
+	useEffect(() => {
+		ReactGA._gaCommandSendPageview(window.location.pathname, {});
+	}, []);
+
 	// New Transaction button component - reusable
-	const NewTransactionButton = ({ className = "", large = false }) => (
-		<Link to="/dashboard/new-transaction" className={className}>
-			<button
-				className={`group bg-[#543A14] text-primary-foreground rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 ${
-					large ? "p-4" : ""
-				}`}
-			>
-				<div className="flex items-center">
-					<PlusCircle className={`${large ? "h-8 w-8" : "h-6 w-6"}`} />
-					<span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-2 transition-all duration-300 ease-in-out whitespace-nowrap">
-						New Transaction
-					</span>
-				</div>
+	const NewTransactionButton = ({ className = "", large = false }) => {
+		const nav = useNavigate();
+
+		const hanldeClick = () => {
+			ReactGA.event({
+				category: "new transaction started",
+				action: "user my create a new transaction",
+			});
+			nav("/dashboard/new-transaction");
+		};
+
+		return (
+			<button onClick={hanldeClick} className={className}>
+				<button
+					className={`group bg-[#543A14] text-primary-foreground rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 ${
+						large ? "p-4" : ""
+					}`}
+				>
+					<div className="flex items-center">
+						<PlusCircle className={`${large ? "h-8 w-8" : "h-6 w-6"}`} />
+						<span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-2 transition-all duration-300 ease-in-out whitespace-nowrap">
+							New Transaction
+						</span>
+					</div>
+				</button>
 			</button>
-		</Link>
-	);
+		);
+	};
 
 	// Handle loading state
 	if (isLoading) {

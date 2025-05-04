@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Wallet, Goal, BarChart, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import ReactGA from "react-ga4";
 
 const CashlyLanding = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,6 +30,13 @@ const CashlyLanding = () => {
 	};
 
 	const currentYear = new Date().getFullYear();
+	const handleGetStartedClick = () => {
+		ReactGA.event({
+			category: "get started",
+			action: "user clicked the Get Started button and my sign in or sign up",
+		});
+		navigate("/signin");
+	};
 
 	return (
 		<div className="min-h-screen bg-[#FFF0DC] text-[#543A14]">
@@ -63,12 +71,12 @@ const CashlyLanding = () => {
 					>
 						Features
 					</a>
-					<Link
-						to={"/signin"}
+					<button
+						onClick={handleGetStartedClick}
 						className="bg-[#543A14] text-[#FFF0DC] px-4 py-2 rounded-lg hover:bg-[#131010] transition"
 					>
 						Get Started
-					</Link>
+					</button>
 				</div>
 			</nav>
 
@@ -86,12 +94,12 @@ const CashlyLanding = () => {
 						<a href="#" className="text-[#543A14]">
 							Features
 						</a>
-						<Link
-							to={"/signin"}
+						<button
+							onClick={handleGetStartedClick}
 							className="bg-[#543A14] text-[#FFF0DC] px-4 py-2 rounded-lg"
 						>
 							Get Started
-						</Link>
+						</button>
 					</div>
 				</motion.div>
 			)}
@@ -115,7 +123,7 @@ const CashlyLanding = () => {
 						<motion.button
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
-							onClick={() => navigate("/signin")}
+							onClick={handleGetStartedClick}
 							className="bg-[#543A14] text-[#FFF0DC] px-6 py-3 rounded-lg hover:bg-[#131010] transition"
 						>
 							Get Started
