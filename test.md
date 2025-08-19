@@ -6,19 +6,19 @@ This document explains the end‑to‑end flow for creating and consuming a vide
 
 ```mermaid
 flowchart TD
-  A[Teacher wants to add video lesson] --> B[Request Upload URL (/api/generate-upload-url)]
-  B -->|Response: { uploadUrl,key,isVideo }| C[Client uploads file via PUT directly to Space]
+  A[Teacher wants to add video lesson] --> B[Request Upload URL /api/generate-upload-url]
+  B -->|Response:  uploadUrl,key,isVideo | C[Client uploads file via PUT directly to Space]
   C --> D[Client calls /api/save-video-metadata with key & originalName]
-  D -->|Video doc created (status=uploaded)| E[Background HLS Processing]
+  D -->|Video doc created status=uploaded| E[Background HLS Processing]
   E -->|Transcode success| F[Video status=ready, hlsPath stored]
   E -->|Failure| G[Video status=failed + error]
-  F --> H[Teacher creates Lesson (POST /lessons) with videoId]
+  F --> H[Teacher creates Lesson POST /lessons with videoId]
   H -->|Lesson stored with video ref| I[Student / Teacher fetch lessons GET /lessons]
   I --> J{contentType == video?}
   J -->|Yes| K[Sign hlsPath on the fly -> short-lived URL]
   J -->|No| L[Return stored contentUrl]
   K --> M[Client player requests manifest URL]
-  M --> N[Space serves HLS manifest & segments (each segment requested separately)]
+  M --> N[Space serves HLS manifest & segments each segment requested separately]
 ```
 
 ## Detailed Steps
