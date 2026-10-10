@@ -220,18 +220,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 		}
 	};
 
-	useEffect(() => {
-		if (!isAuthenticated) return;
-
-		// Set up automatic token refresh - refresh every 45 minutes
-		// (assuming tokens expire after 1 hour)
-		const refreshInterval = setInterval(() => {
-			refreshToken();
-		}, 45 * 60 * 1000); // 45 minutes
-
-		return () => clearInterval(refreshInterval);
-	}, [isAuthenticated]);
-
 	const logout = async () => {
 		try {
 			await axios.post(`${baseUrl}/auth/logout`, {}, { withCredentials: true });

@@ -20,6 +20,7 @@ import {
 	ShoppingBag,
 	DollarSign,
 	Info,
+	Folder,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import TransactionsApi from "@/api/Transactions";
@@ -45,6 +46,10 @@ interface Transaction {
 		_id: string;
 		goalName: string;
 	};
+	expenseCollection?: {
+		_id: string;
+		name: string;
+	} | null;
 }
 
 // Function to render icon based on transactionIcon string
@@ -265,6 +270,24 @@ function TransactionDetail() {
 											className="hover:underline"
 										>
 											{transaction.goal.goalName}
+										</a>
+									</p>
+								</div>
+							</div>
+						)}
+
+						{/* Related expense list if available */}
+						{transaction.expenseCollection && (
+							<div className="flex items-start gap-2">
+								<Folder className="h-5 w-5 text-gray-500 mt-0.5" />
+								<div>
+									<p className="font-semibold">Part of Expense List</p>
+									<p className="text-primary">
+										<a
+											href={`/dashboard/expense-collections/${transaction.expenseCollection._id}`}
+											className="hover:underline"
+										>
+											{transaction.expenseCollection.name}
 										</a>
 									</p>
 								</div>

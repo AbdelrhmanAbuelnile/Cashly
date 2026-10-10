@@ -7,6 +7,11 @@ type TransactionTypes = {
 	createdAt: string;
 	description?: string;
 	transactionIcon?: string;
+	expenseCollection?: {
+		_id: string;
+		name: string;
+		icon?: string;
+	} | null;
 };
 
 export type { TransactionTypes };

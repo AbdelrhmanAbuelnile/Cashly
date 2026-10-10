@@ -44,6 +44,10 @@ interface Transaction {
 	transactionIcon?: string;
 	createdAt: string;
 	updatedAt: string;
+	expenseCollection?: {
+		_id: string;
+		name: string;
+	} | null;
 }
 
 function Transactions() {
@@ -322,6 +326,15 @@ function Transactions() {
 											<p className="text-sm text-gray-600 mt-1">
 												{transaction.description}
 											</p>
+										)}
+										{transaction.expenseCollection && (
+											<Link
+												to={`/dashboard/expense-collections/${transaction.expenseCollection._id}`}
+												onClick={(e) => e.stopPropagation()}
+												className="inline-block mt-1 text-xs px-2 py-0.5 rounded-full bg-[#F0BB78]/60 text-[#543A14] hover:underline"
+											>
+												{transaction.expenseCollection.name}
+											</Link>
 										)}
 									</div>
 

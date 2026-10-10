@@ -10,6 +10,9 @@ import GoalDetail from "./pages/dashboard/pages/GoalDetail";
 import NewGoal from "./pages/dashboard/pages/NewGoal";
 import TransactionDetail from "./pages/dashboard/pages/TransactionDetail";
 import NewTransaction from "./pages/dashboard/pages/NewTransaction";
+import ExpenseCollections from "./pages/dashboard/pages/ExpenseCollections";
+import NewExpenseCollection from "./pages/dashboard/pages/NewExpenseCollection";
+import ExpenseCollectionDetail from "./pages/dashboard/pages/ExpenseCollectionDetail";
 import { useAuth } from "./hooks/useAuth";
 import { useEffect } from "react";
 import TermsAndConditionsPage from "./pages/dashboard/TermsAndConditionsPage";
@@ -52,6 +55,15 @@ const App = () => {
 				<Route
 					path="transactions/:transactionId"
 					element={<TransactionDetail />}
+				/>
+				<Route path="expense-collections" element={<ExpenseCollections />} />
+				<Route
+					path="expense-collections/new"
+					element={<NewExpenseCollection />}
+				/>
+				<Route
+					path="expense-collections/:collectionId"
+					element={<ExpenseCollectionDetail />}
 				/>
 				<Route path="settings" element={<SettingsPage />} />
 			</Route>

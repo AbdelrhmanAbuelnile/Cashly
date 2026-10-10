@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Wallet, Goal, Settings, Menu, X } from "lucide-react";
+import { Wallet, Goal, Settings, Menu, X, ListChecks } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import UserProfileDropdown from "./components/UserProfileDropdown";
 import Sidebar from "./components/Sidebar";
@@ -28,6 +28,11 @@ const DashboardPage = () => {
 		// Handle other potential detail pages
 		if (pathSegments.length > 2 && mainSection === "goals") {
 			return { path: mainSection, title: "Goal Details" };
+		}
+
+		if (pathSegments.length > 2 && mainSection === "expense-collections") {
+			const title = pathSegments[2] === "new" ? "New Expense List" : "Expense List";
+			return { path: mainSection, title };
 		}
 
 		// Regular pages
@@ -62,6 +67,12 @@ const DashboardPage = () => {
 			label: "Goals",
 			key: "goals",
 			path: "/dashboard/goals",
+		},
+		{
+			icon: ListChecks,
+			label: "Expense Lists",
+			key: "expense-collections",
+			path: "/dashboard/expense-collections",
 		},
 		{
 			icon: Settings,
